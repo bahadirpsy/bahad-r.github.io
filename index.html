@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video ve Stroop Testi</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #f5f5f5; 
+            margin: 0;
+            padding: 20px;
+        }
+        #container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: white; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        #videoContainer { 
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        #videoContainer iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #continueButton { 
+            padding: 12px 24px; 
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        #continueButton:hover {
+            background-color: #45a049;
+        }
+        h1, h2 { 
+            color: #333; 
+            margin-top: 0;
+        }
+        .instructions { 
+            line-height: 1.6; 
+            color: #555; 
+            text-align: left; 
+            margin: 20px 0; 
+            padding: 15px; 
+            background-color: #f9f9f9; 
+            border-left: 4px solid #4CAF50;
+            border-radius: 0 4px 4px 0;
+        }
+        .loading-message {
+            font-style: italic;
+            color: #777;
+            margin: 10px 0;
+        }
+        .form-section {
+            text-align: left;
+            margin: 30px 0;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .radio-group {
+            margin-top: 5px;
+        }
+        .radio-option {
+            margin-bottom: 5px;
+        }
+        .form-intro {
+            font-style: italic;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-header {
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #2e5984;
+        }
+        #demographicForm {
+            margin-bottom: 30px;
+        }
+        #submitForm {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #2e5984;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+        #submitForm:hover {
+            background-color: #1d3c5c;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="demographicForm" class="form-section">
+            <h2>Ek 1. Sosyodemografik Bilgi Formu</h2>
+            <div class="form-intro">
+                <p>Değerli Katılımcı,</p>
+                <p>Bu form, araştırmamız için önemli olan demografik bilgilerinizi toplamak amacıyla hazırlanmıştır. Verdiğiniz tüm bilgiler anonim olarak değerlendirilecek ve yalnızca bilimsel amaçlarla kullanılacaktır. Lütfen tüm soruları eksiksiz ve doğru bir şekilde yanıtlayınız.</p>
+            </div>
+            
+            <div class="form-header">KİŞİSEL BİLGİLER</div>
+            
+            <div class="form-group">
+                <label for="age">1. Yaş:</label>
+                <input type="number" id="age" name="age" min="18" max="100">
+            </div>
+            
+            <div class="form-group">
+                <label>2. Cinsiyet:</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="gender1" name="gender" value="kadin">
+                        <label for="gender1">Kadın</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="gender2" name="gender" value="erkek">
+                        <label for="gender2">Erkek</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="gender3" name="gender" value="diger">
+                        <label for="gender3">Diğer/Belirtmek istemiyorum</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>3. Eğitim Durumu:</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="edu1" name="education" value="lise">
+                        <label for="edu1">Lise</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="edu2" name="education" value="uni1">
+                        <label for="edu2">Üniversite (1. Sınıf)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="edu3" name="education" value="uni2">
+                        <label for="edu3">Üniversite (2. Sınıf)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="edu4" name="education" value="uni3">
+                        <label for="edu4">Üniversite (3. Sınıf)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="edu5" name="education" value="uni4">
+                        <label for="edu5">Üniversite (4. Sınıf)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="edu6" name="education" value="postgrad">
+                        <label for="edu6">Lisansüstü (Yüksek Lisans/Doktora)</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-header">SAĞLIK BİLGİLERİ</div>
+            
+            <div class="form-group">
+                <label>4. Herhangi bir psikiyatrik tanınız var mı?</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="psych1" name="psychiatric" value="evet" onchange="togglePsychInput()">
+                        <label for="psych1">Evet</label>
+                        <input type="text" id="psychiatricDetails" name="psychiatricDetails" placeholder="Lütfen belirtiniz" style="display:none; width:80%; margin-left:20px; margin-top:5px;">
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="psych2" name="psychiatric" value="hayir" onchange="togglePsychInput()">
+                        <label for="psych2">Hayır</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>5. Düzenli kullandığınız ilaçlar var mı?</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="med1" name="medication" value="evet" onchange="toggleMedInput()">
+                        <label for="med1">Evet</label>
+                        <input type="text" id="medicationDetails" name="medicationDetails" placeholder="Lütfen belirtiniz" style="display:none; width:80%; margin-left:20px; margin-top:5px;">
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="med2" name="medication" value="hayir" onchange="toggleMedInput()">
+                        <label for="med2">Hayır</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>6. Uyku düzeninizi nasıl tanımlarsınız?</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="sleep1" name="sleepPattern" value="duzenli">
+                        <label for="sleep1">Düzenli</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="sleep2" name="sleepPattern" value="duzensiz">
+                        <label for="sleep2">Düzensiz</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="sleepDuration">7. Günlük ortalama uyku süreniz (saat):</label>
+                <input type="number" id="sleepDuration" name="sleepDuration" min="1" max="24">
+            </div>
+            
+            <div class="form-group">
+                <label for="stressLevel">8. Genel stres düzeyinizi 1-10 arasında değerlendiriniz (1: Çok düşük, 10: Çok yüksek):</label>
+                <input type="number" id="stressLevel" name="stressLevel" min="1" max="10">
+            </div>
+            
+            <div class="form-group">
+                <label>9. Kendinizde dikkat problemi olduğunu düşünüyor musunuz?</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="attention1" name="attentionProblem" value="evet" onchange="toggleAttentionInput()">
+                        <label for="attention1">Evet</label>
+                        <input type="text" id="attentionDetails" name="attentionDetails" placeholder="Lütfen kısaca açıklayınız" style="display:none; width:80%; margin-left:20px; margin-top:5px;">
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="attention2" name="attentionProblem" value="hayir" onchange="toggleAttentionInput()">
+                        <label for="attention2">Hayır</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-header">YAŞAM ALIŞKANLIKLARI VE DOĞA İLİŞKİSİ</div>
+            
+            <div class="form-group">
+                <label>10. Yaşadığınız ortam:</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="living1" name="livingEnvironment" value="sehirMerkezi">
+                        <label for="living1">Şehir merkezi</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="living2" name="livingEnvironment" value="sehirKenari">
+                        <label for="living2">Şehir kenarı</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="living3" name="livingEnvironment" value="kasaba">
+                        <label for="living3">Kasaba/İlçe</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="living4" name="livingEnvironment" value="kirsal">
+                        <label for="living4">Kırsal alan</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>11. Günlük doğada geçirdiğiniz ortalama süre:</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="nature1" name="natureTime" value="hic">
+                        <label for="nature1">Hiç</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="nature2" name="natureTime" value="az30">
+                        <label for="nature2">30 dakikadan az</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="nature3" name="natureTime" value="30-60">
+                        <label for="nature3">30-60 dakika</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="nature4" name="natureTime" value="1-2saat">
+                        <label for="nature4">1-2 saat</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="nature5" name="natureTime" value="2saat+">
+                        <label for="nature5">2 saatten fazla</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>12. Son 3 ay içinde doğa aktivitelerine (yürüyüş, kamp, piknik vb.) katılım sıklığınız:</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="activity1" name="natureActivity" value="hic">
+                        <label for="activity1">Hiç</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="activity2" name="natureActivity" value="aydaBirAz">
+                        <label for="activity2">Ayda birden az</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="activity3" name="natureActivity" value="ayda1-2">
+                        <label for="activity3">Ayda 1-2 kez</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="activity4" name="natureActivity" value="hafta1-2">
+                        <label for="activity4">Haftada 1-2 kez</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="activity5" name="natureActivity" value="hafta3+">
+                        <label for="activity5">Haftada 3 veya daha fazla</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-header">TEKNOLOJİ KULLANIMI VE MEDYA TÜKETİMİ</div>
+            
+            <div class="form-group">
+                <label>13. Günlük ekran başında geçirdiğiniz ortalama süre (telefon, bilgisayar, televizyon dahil):</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="screen1" name="screenTime" value="1saat-">
+                        <label for="screen1">1 saatten az</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="screen2" name="screenTime" value="1-3saat">
+                        <label for="screen2">1-3 saat</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="screen3" name="screenTime" value="3-5saat">
+                        <label for="screen3">3-5 saat</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="screen4" name="screenTime" value="5-8saat">
+                        <label for="screen4">5-8 saat</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="screen5" name="screenTime" value="8saat+">
+                        <label for="screen5">8 saatten fazla</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>14. Ortalama haftalık film/dizi izleme süreniz:</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="media1" name="mediaTime" value="1saat-">
+                        <label for="media1">1 saatten az</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="media2" name="mediaTime" value="1-5saat">
+                        <label for="media2">1-5 saat</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="media3" name="mediaTime" value="5-10saat">
+                        <label for="media3">5-10 saat</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="media4" name="mediaTime" value="10-15saat">
+                        <label for="media4">10-15 saat</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="media5" name="mediaTime" value="15saat+">
+                        <label for="media5">15 saatten fazla</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>15. Doğa belgeselleri ve sakinlik içerikli videolar izleme sıklığınız:</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="nature_media1" name="natureMedia" value="hic">
+                        <label for="nature_media1">Hiç</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="nature_media2" name="natureMedia" value="nadiren">
+                        <label for="nature_media2">Nadiren</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="nature_media3" name="natureMedia" value="bazen">
+                        <label for="nature_media3">Bazen</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="nature_media4" name="natureMedia" value="siklikla">
+                        <label for="nature_media4">Sıklıkla</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="nature_media5" name="natureMedia" value="cokSiklikla">
+                        <label for="nature_media5">Çok sıklıkla</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>16. Bilgiye erişim kanallarınız (Birden fazla seçenek işaretleyebilirsiniz):</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="checkbox" id="info1" name="infoChannel" value="sosyalMedya">
+                        <label for="info1">Sosyal medya</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="checkbox" id="info2" name="infoChannel" value="internetHaber">
+                        <label for="info2">İnternet haber siteleri</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="checkbox" id="info3" name="infoChannel" value="televizyon">
+                        <label for="info3">Televizyon</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="checkbox" id="info4" name="infoChannel" value="basiliYayin">
+                        <label for="info4">Basılı yayınlar (gazete, dergi)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="checkbox" id="info5" name="infoChannel" value="akademik">
+                        <label for="info5">Akademik kaynaklar</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="checkbox" id="info6" name="infoChannel" value="diger" onchange="toggleInfoInput()">
+                        <label for="info6">Diğer</label>
+                        <input type="text" id="infoDetails" name="infoDetails" placeholder="Lütfen belirtiniz" style="display:none; width:80%; margin-left:20px; margin-top:5px;">
+                    </div>
+                </div>
+            </div>
+            
+            <button id="submitForm" type="button" onclick="submitDemographicForm()">Formu Gönder</button>
+        </div>
+
+        <h1>Deney: Video ve Stroop Testi</h1>
+        <div class="instructions">
+            <p><strong>Yönergeler:</strong></p>
+            <p>1. Lütfen aşağıdaki videoyu sonuna kadar ve dikkatle izleyin.</p>
+            <p>2. Video tamamlandığında, "Stroop Testine Devam Et" butonu otomatik olarak görünecektir.</p>
+            <p>3. Butona tıklayarak deneyin ikinci aşamasına geçebilirsiniz.</p>
+        </div>
+        <div id="videoContainer">
+            <iframe id="experimentVideo" src="https://www.youtube.com/embed/wOUQIV8L7Zg?enablejsapi=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <p class="loading-message" id="loadingMessage">Video yükleniyor, lütfen bekleyiniz...</p>
+        <button id="continueButton" onclick="redirectToStroop()">Stroop Testine Devam Et</button>
+    </div>
+
+    <script>
+        // Demografik form için toggle fonksiyonları
+        function togglePsychInput() {
+            document.getElementById('psychiatricDetails').style.display = 
+                document.getElementById('psych1').checked ? 'inline-block' : 'none';
+        }
+        
+        function toggleMedInput() {
+            document.getElementById('medicationDetails').style.display = 
+                document.getElementById('med1').checked ? 'inline-block' : 'none';
+        }
+        
+        function toggleAttentionInput() {
+            document.getElementById('attentionDetails').style.display = 
+                document.getElementById('attention1').checked ? 'inline-block' : 'none';
+        }
+        
+        function toggleInfoInput() {
+            document.getElementById('infoDetails').style.display = 
+                document.getElementById('info6').checked ? 'inline-block' : 'none';
+        }
+        
+        // Form gönderimi
+        function submitDemographicForm() {
+            // Burada form verilerini işleme kodları olacak
+            // Gerçek uygulamada bu verileri bir veritabanına gönderebilirsiniz
+            
+            // Form bölümünü gizle ve video bölümünü göster
+            document.getElementById('demographicForm').style.display = 'none';
+            
+            // Form gönderildi mesajı göster
+            alert('Formunuz başarıyla kaydedilmiştir. Şimdi lütfen videoyu izleyiniz.');
+        }
+        
+        // YouTube API'sini yükle
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var videoLoaded = false;
+
+        // YouTube API hazır olduğunda çağrılır
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('experimentVideo', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // Video oynatıcı hazır olduğunda çağrılır
+        function onPlayerReady(event) {
+            videoLoaded = true;
+            document.getElementById('loadingMessage').style.display = 'none';
+        }
+
+        // Video durumu değiştiğinde çağrılır
+        function onPlayerStateChange(event) {
+            // Video bittiğinde (durum 0)
+            if (event.data == YT.PlayerState.ENDED) {
+                document.getElementById('continueButton').style.display = 'inline-block';
+            }
+        }
+
+        // Stroop testine yönlendir
+        function redirectToStroop() {
+            window.location.href = 'https://www.psytoolkit.org/c/3.6.2/survey?s=48HrC';
+        }
+
+        // YouTube API yüklenemezse veya gecikmesi olursa, 10 saniye sonra kontrol et
+        setTimeout(function() {
+            if (!videoLoaded) {
+                // Yedek kontrol sistemi - API yüklenmediyse
+                var iframe = document.getElementById('experimentVideo');
+                if (iframe) {
+                    document.getElementById('loadingMessage').textContent = 'Video yüklendi, lütfen izleyin. Video bittiğinde devam butonuna tıklayın.';
+                    document.getElementById('continueButton').style.display = 'inline-block';
+                }
+            }
+        }, 10000);
+    </script>
+</body>
+</html>
